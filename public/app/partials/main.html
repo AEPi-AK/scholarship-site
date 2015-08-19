@@ -1,6 +1,7 @@
 <div class="jumbotron">
   <div class="container header">
     <h1>3 Simple Steps!</h1>
+    <h2>{{nameField}}</h2>
   </div>
 </div>
 
@@ -8,14 +9,14 @@
   <div class="row">
 
     <div class="col-md-4">
-      <h2 class="sub-header">1. Paste Audit Here:</h2>
-
+      <h2>1. Paste Audit Here:</h2>
+      <p><a href="https://enr-apps.as.cmu.edu/audit/audit?call=14&college=college&major=degree+in+major&year=catalog_year&MajorFile=2010%3ASCS%3ABS%3ACS.MAJ&Calculate=Audit+degree+in+major" target="_blank">Click here</a> to view your academic audit. Then copy and paste the entire page here. Don't worry, we don't record your grades.</p>
       <textarea class="form-control" rows="5" ng-model="audit"></textarea>
     </div>
 
     <div class="col-md-5">
-      <h2 class="sub-header">2. Check Boxes:</h2>
-      <p class="sub-header">Check the boxes of courses you could help another student in. If you are currently enrolled in the course, check that box instead.</p>
+      <h2>2. Check Boxes:</h2>
+      <p>Check the boxes of courses you feel that you would be able to help another student in. If you are currently enrolled in the  course, check that box instead.</p>
       <table class="table">
         <thead>
           <tr>
@@ -25,19 +26,18 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="className in classNames">
-            <td>{{className}}</td>
-            <td><input type="checkbox" value="helping{{className}}"></td>
-            <td><input type="checkbox" value="taking{{className}}"></td>
+          <tr ng-repeat="classNumber in classNumberList">
+            <td>{{classNumber}} - {{classNameList[classNumber]}}</td>
+            <td><input type="checkbox" ng-model="finalData[classNumber].canHelp"></td>
+            <td><input type="checkbox" ng-model="finalData[classNumber].isTaking"></td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <div class="col-md-3">
-      <h2 class="sub-header">3. Click Here:</h2>
-
-      <button type="button" class="btn btn-primary">Click Here!</button>
+      <h2>3. Click Here:</h2>
+      <button type="button" class="btn btn-primary btn-lg" ng-click="submitData()">Click Here!</button>
     </div>
 
   </div>

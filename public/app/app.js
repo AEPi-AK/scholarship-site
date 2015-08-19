@@ -15,41 +15,56 @@ app.config(function ($routeProvider) {
 });
 
 app.controller('MainController', function ($scope) {
+	$scope.finalData = [];
 
 	// Watches the text field for text input.
 	$scope.$watch("audit", function (input) {
 
-		// Regex parse the input field for courses.
-		$scope.classNames = new String(input).match(/([\d]{2}-[\d]{3} (Fall|Spring|Summer))(?!.* AP )/gm);
+		// Regex parse the input field for courses (excluse AP courses).
+		$scope.classNumberList = new String(input).match(/([\d]{2}-[\d]{3} (Fall|Spring|Summer))(?!.* AP )/gm);
 
-		if ($scope.classNames) {
+		// We were able to successfully parse the input.
+		if ($scope.classNumberList) {
+
+			// Set the name.
+			var studentName = input.split('\n')[1];
+			$scope.nameField = "Name: " + studentName;
 
 			// Removes the Fall/Spring/Summer string.
-			$scope.classNames = $scope.classNames.map(function (match) {
+			$scope.classNumberList = $scope.classNumberList.map(function (match) {
 				return /[\d]{2}-[\d]{3}/.exec(match).toString();
 			});
 
-			// Removes C@CM, CS Immigration Course, and Interp.
-			$scope.classNames = jQuery.grep($scope.classNames, function(value) {
-				return  value != "99-101" &&
-								value != "15-128" &&
-								value != "76-101";
+			// Removes C@CM.
+			$scope.classNumberList = jQuery.grep($scope.classNumberList, function(value) {
+				return value != "99-101";
 			});
 
 			// Sorts the list.
-			$scope.classNames.sort();
+			$scope.classNumberList.sort();
 
-			// Adds in class name.
-			for (var i = 0; i < $scope.classNames.length; i++) {
-				$scope.classNames[i] = $scope.classNames[i] + " - " + numberToClass[$scope.classNames[i]];
+			// Adds in class name and initializes final data dictionary.
+			$scope.classNameList = [];
+			for (var i = 0; i < $scope.classNumberList.length; i++) {
+				$scope.classNameList[$scope.classNumberList[i]] =
+					numberToClass[$scope.classNumberList[i]] || "(class name not found)";
+
+				$scope.finalData[$scope.classNumberList[i]] = {
+					canHelp : false,
+					isTaking : false
+				};
 			}
 
 		}
-  });
+	});
+
+	$scope.submitData = function() {
+		$.post( "/", $scope.finalData );
+	}
+
 });
 
-
-
+// 2500+ element dictionary in memory, mapping class number to class name.
 var numberToClass = {
 	"03-050" : "Study Abroad",
 	"03-051" : "Study Abroad",
