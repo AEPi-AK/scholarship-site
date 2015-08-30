@@ -5,6 +5,7 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "express": "*"
+    "express": "*",
+    "body-parser": "*"
   }
 }

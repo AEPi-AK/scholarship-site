@@ -17,49 +17,64 @@ app.config(function ($routeProvider) {
 app.controller('MainController', function ($scope) {
 	$scope.finalData = [];
 
-	// Watches the text field for text input.
+	// Watch the text field for text input.
 	$scope.$watch("audit", function (input) {
 
 		// Regex parse the input field for courses (excluse AP courses).
 		$scope.classNumberList = new String(input).match(/([\d]{2}-[\d]{3} (Fall|Spring|Summer))(?!.* AP )/gm);
 
+		// Regex parse the input field for only courses currently enrolled in.
+		$scope.takingNumberList = new String(input).match(/([\d]{2}-[\d]{3} Fall)(.* '15 )/gm);
+
 		// We were able to successfully parse the input.
 		if ($scope.classNumberList) {
 
-			// Set the name.
+			// Parse the student name from the input.
 			var studentName = input.split('\n')[1];
 			$scope.nameField = "Name: " + studentName;
 
-			// Removes the Fall/Spring/Summer string.
+			// Remove the Fall/Spring/Summer string.
 			$scope.classNumberList = $scope.classNumberList.map(function (match) {
-				return /[\d]{2}-[\d]{3}/.exec(match).toString();
+				return /[\d]{2}-[\d]{3}/.exec(match).toString();});
+			$scope.takingNumberList = $scope.takingNumberList.map(function (match) {
+				return /[\d]{2}-[\d]{3}/.exec(match).toString();});
+
+			// Remove C@CM and StuCos.
+			$scope.classNumberList = jQuery.grep($scope.classNumberList, function(course) {
+				var college = course.substring(0, 2);
+				return college != "99" && college != "98";
 			});
 
-			// Removes C@CM.
-			$scope.classNumberList = jQuery.grep($scope.classNumberList, function(value) {
-				return value != "99-101";
-			});
-
-			// Sorts the list.
+			// Sort the list.
 			$scope.classNumberList.sort();
 
-			// Adds in class name and initializes final data dictionary.
+			// Add in class name and initializes final data dictionary.
+			$scope.finalData = {}
 			$scope.classNameList = [];
 			for (var i = 0; i < $scope.classNumberList.length; i++) {
-				$scope.classNameList[$scope.classNumberList[i]] =
-					numberToClass[$scope.classNumberList[i]] || "(class name not found)";
+				var classNumber = $scope.classNumberList[i]
+				$scope.classNameList[classNumber] =
+					numberToClass[classNumber] || "(class name not found)";
 
-				$scope.finalData[$scope.classNumberList[i]] = {
+				$scope.finalData[classNumber] = {
 					canHelp : false,
-					isTaking : false
+					isTaking : $.inArray(classNumber, $scope.takingNumberList) != -1
 				};
 			}
+
+			$scope.finalData["name"] = studentName;
 
 		}
 	});
 
 	$scope.submitData = function() {
-		$.post( "/", $scope.finalData );
+		$.ajax({
+        type: 'POST',
+        data: JSON.stringify($scope.finalData),
+        contentType: "application/json",
+        dataType:'json',
+        url: '/'
+    });
 	}
 
 });
@@ -2802,17 +2817,4 @@ var numberToClass = {
 	"88-452" : "Policy Analysis Senior Project",
 	"88-499" : "Advanced Undergraduate Research",
 	"88-505" : "Undergraduate Internship",
-	"99-101" : "Computing @ Carnegie Mellon",
-	"99-102" : "Computing @ Carnegie Mellon",
-	"99-103" : "Computing @ Carnegie Mellon",
-	"99-104" : "Carnegie Skills Workshop",
-	"99-200" : "Tutoring, Mentoring and Role Modeling--A Community Service Course",
-	"99-238" : "Materials, Energy and Environment",
-	"99-241" : "Revolutions of Circularity",
-	"99-242" : "Meaning Across the Millennia",
-	"99-250" : "Seminar for Peer Tutors",
-	"99-251" : "Seminar for Supplemental Instruction",
-	"99-252" : "Seminar for Academic Counseling",
-	"99-415" : "Internship in Educational Outreach",
-	"99-451" : "Building Fluency for Presentations: A class for nonnative English speakers"
 }
