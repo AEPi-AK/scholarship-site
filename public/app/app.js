@@ -16,6 +16,7 @@ app.config(function ($routeProvider) {
 
 app.controller('MainController', function ($scope) {
 	$scope.finalData = [];
+	$scope.action = "3 Simple Steps!";
 
 	// Watch the text field for text input.
 	$scope.$watch("audit", function (input) {
@@ -75,6 +76,7 @@ app.controller('MainController', function ($scope) {
 				dataType:'json',
 				url: '/'
 		});
+		$scope.action = "THANK YOU!!!";
 	}
 });
 
