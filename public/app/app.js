@@ -30,7 +30,7 @@ app.controller('MainController', function ($scope) {
 		if ($scope.classNumberList) {
 
 			// Parse the student name from the input.
-			var studentName = input.split('\n')[1];
+			var studentName = input.split('\n')[input.split('\n').indexOf("Course-Requirement Matchings")-2];
 			$scope.nameField = "Name: " + studentName;
 
 			// Remove the Fall/Spring/Summer string.
@@ -69,14 +69,13 @@ app.controller('MainController', function ($scope) {
 
 	$scope.submitData = function() {
 		$.ajax({
-        type: 'POST',
-        data: JSON.stringify($scope.finalData),
-        contentType: "application/json",
-        dataType:'json',
-        url: '/'
-    });
+				type: 'POST',
+				data: JSON.stringify($scope.finalData),
+				contentType: "application/json",
+				dataType:'json',
+				url: '/'
+		});
 	}
-
 });
 
 // 2500+ element dictionary in memory, mapping class number to class name.
@@ -2817,4 +2816,4 @@ var numberToClass = {
 	"88-452" : "Policy Analysis Senior Project",
 	"88-499" : "Advanced Undergraduate Research",
 	"88-505" : "Undergraduate Internship",
-}
+};
