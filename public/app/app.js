@@ -77,6 +77,7 @@ app.controller('MainController', function ($scope) {
 				url: '/'
 		});
 		$scope.action = "THANK YOU!!!";
+		alert("Thank you!");
 	}
 });
 
